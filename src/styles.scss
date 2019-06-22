@@ -1,0 +1,26 @@
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100%;
+  font-family: Roboto, Calibri, Arial, sans-serif;
+  min-width: 320px;
+  box-sizing: border-box;
+}
+
+img {
+  display: block;
+  border: 0;
+}
+
+p {
+  font-size: 16px;
+  line-height: 20px;
+  margin: 0 0 20px 0;
+}
