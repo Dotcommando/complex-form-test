@@ -1,149 +1,154 @@
-<form [formGroup]="form" (ngSubmit)="submit()" enctype="multipart/form-data">
+<form [formGroup]="form" (ngSubmit)="submit()" class="form-group" enctype="multipart/form-data">
 
-  <div class="form-row">
-    <mat-form-field>
-      <input
-        matInput
-        placeholder="{{fieldsData.fullname.placeholder}}"
-        formControlName="fullname"
-      />
-    </mat-form-field>
-    <div *ngIf="form.controls['fullname'].invalid && (form.controls['fullname'].dirty || form.controls['fullname'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['fullname'].errors.required">
-        Пожалуйста, введите Ваше имя и фамилию.
-      </div>
+  <div class="left-col">
+    <div class="form-row">
+      <mat-form-field>
+        <input
+          matInput
+          placeholder="Введите фамилию и имя"
+          formControlName="fullname"
+        />
+      </mat-form-field>
+      <div *ngIf="form.controls['fullname'].invalid && (form.controls['fullname'].dirty || form.controls['fullname'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['fullname'].errors.required">
+          Пожалуйста, введите Ваше имя и фамилию.
+        </div>
 
-      <div *ngIf="form.controls['fullname'].errors.pattern && !form.controls['fullname'].errors.required && form.controls['fullname'].touched">
-        Пожалуйста, используйте кириллицу при вводе имени и фамилии.
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <mat-radio-group
-      formControlName="gender"
-    >
-      <mat-label>Пол:</mat-label>
-      <mat-radio-button value="m">Мужской</mat-radio-button>
-      <mat-radio-button value="f">Женский</mat-radio-button>
-    </mat-radio-group>
-    <div *ngIf="form.controls['gender'].invalid && (form.controls['gender'].dirty || form.controls['gender'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['gender'].errors.required">
-        Пожалуйста, выберите пол.
+        <div *ngIf="form.controls['fullname'].errors.pattern && !form.controls['fullname'].errors.required && form.controls['fullname'].touched">
+          Пожалуйста, используйте кириллицу при вводе имени и фамилии.
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="form-row">
-    <mat-form-field>
-      <mat-label>Дата рождения:</mat-label>
-      <input
-        matInput
-        formControlName="birthday"
-        [matDatepicker]="birthday"
-        [matDatepickerFilter]="birthdayPickerFilter"
+    <div class="form-row">
+      <mat-radio-group
+        formControlName="gender"
       >
-      <mat-datepicker-toggle matSuffix [for]="birthday"></mat-datepicker-toggle>
-      <mat-datepicker #birthday></mat-datepicker>
-    </mat-form-field>
-    <div *ngIf="form.controls['birthday'].invalid && (form.controls['birthday'].dirty || form.controls['birthday'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['birthday'].errors.required">
-        Поле &laquo;День рождения&raquo; обязательно к заполнению.
+        <mat-label>Пол:</mat-label>
+        <mat-radio-button value="m">Мужской</mat-radio-button>
+        <mat-radio-button value="f">Женский</mat-radio-button>
+      </mat-radio-group>
+      <div *ngIf="form.controls['gender'].invalid && (form.controls['gender'].dirty || form.controls['gender'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['gender'].errors.required">
+          Пожалуйста, выберите пол.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Дата рождения:</mat-label>
+        <input
+          matInput
+          formControlName="birthday"
+          [matDatepicker]="birthday"
+          [matDatepickerFilter]="birthdayPickerFilter"
+        >
+        <mat-datepicker-toggle matSuffix [for]="birthday"></mat-datepicker-toggle>
+        <mat-datepicker #birthday></mat-datepicker>
+      </mat-form-field>
+      <div *ngIf="form.controls['birthday'].invalid && (form.controls['birthday'].dirty || form.controls['birthday'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['birthday'].errors.required">
+          Поле &laquo;День рождения&raquo; обязательно к заполнению.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Семейное положение</mat-label>
+        <mat-select
+          matNativeControl
+          formControlName="maritalStatus"
+        >
+          <mat-option *ngFor="let status of maritalStatuses" [value]="status.value">{{status.text}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div *ngIf="form.controls['maritalStatus'].invalid && (form.controls['maritalStatus'].dirty || form.controls['maritalStatus'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['maritalStatus'].errors.required">
+          Вам больше 18 лет, поэтому поле &laquo;Семейное положение&raquo; обязательно к заполнению
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="form-row">
-    <mat-form-field>
-      <mat-label>Семейное положение</mat-label>
-      <mat-select
-        matNativeControl
-        formControlName="maritalStatus"
-      >
-        <mat-option *ngFor="let status of maritalStatuses" [value]="status.value">{{status.text}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <div class="right-col">
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Количество детей:</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="kids"
+          step="1"
+          min="0"
+          max="64"
+          (keydown)="kidsNumberInput($event)"
+        >
+      </mat-form-field>
+      <div *ngIf="form.controls['kids'].invalid"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['kids'].errors.min">
+          Как-то очень мало детей.
+        </div>
 
-    <div *ngIf="form.controls['maritalStatus'].invalid && (form.controls['maritalStatus'].dirty || form.controls['maritalStatus'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['maritalStatus'].errors.required">
-        Вам больше 18 лет, поэтому поле &laquo;Семейное положение&raquo; обязательно к заполнению
+        <div *ngIf="form.controls['kids'].errors.max">
+          Максимум 64 ребёнка.
+        </div>
       </div>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>E-mail:</mat-label>
+        <input
+          matInput
+          formControlName="email"
+        >
+      </mat-form-field>
+      <div *ngIf="form.controls['email'].invalid && (form.controls['email'].dirty || form.controls['email'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['email'].errors.required">
+          Пожалуйста, введите Ваш e-mail.
+        </div>
+
+        <div *ngIf="form.controls['email'].errors.pattern && !form.controls['email'].errors.required && form.controls['email'].touched">
+          E-mail введён некорректно (((
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field>
+        <mat-label>Комментарий:</mat-label>
+        <textarea
+          matInput
+          formControlName="comment"
+        >
+        </textarea>
+      </mat-form-field>
+      <div *ngIf="form.controls['comment'].invalid && (form.controls['comment'].dirty || form.controls['comment'].touched)"
+           class="alert alert-danger">
+        <div *ngIf="form.controls['comment'].errors.pattern && form.controls['comment'].touched">
+          Пожалуйста, пользуйтесь только кириллицей.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <button mat-raised-button type="submit" color="primary" [disabled]="submitIsLocked">Отправить</button>
+      <div *ngIf="form.invalid && submitIsLocked" class="alert alert-danger">
+        Форма содержит ошибки.
+      </div>
+      <div *ngIf="successSubmitted" class="alert alert-success">Форма успешно отправлена!</div>
     </div>
   </div>
 
-  <div class="form-row">
-    <mat-form-field>
-      <mat-label>Количество детей:</mat-label>
-      <input
-        matInput
-        type="number"
-        formControlName="kids"
-        step="1"
-        min="0"
-        max="64"
-        (keydown)="kidsNumberInput($event)"
-      >
-    </mat-form-field>
-    <div *ngIf="form.controls['kids'].invalid"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['kids'].errors.min">
-        Как-то очень мало детей.
-      </div>
-
-      <div *ngIf="form.controls['kids'].errors.max">
-        Максимум 64 ребёнка.
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <mat-form-field>
-      <mat-label>E-mail:</mat-label>
-      <input
-        matInput
-        formControlName="email"
-      >
-    </mat-form-field>
-    <div *ngIf="form.controls['email'].invalid && (form.controls['email'].dirty || form.controls['email'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['email'].errors.required">
-        Пожалуйста, введите Ваш e-mail.
-      </div>
-
-      <div *ngIf="form.controls['email'].errors.pattern && !form.controls['email'].errors.required && form.controls['email'].touched">
-        E-mail введён некорректно (((
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <mat-form-field>
-      <mat-label>Комментарий:</mat-label>
-      <textarea
-        matInput
-        formControlName="comment"
-      >
-      </textarea>
-    </mat-form-field>
-    <div *ngIf="form.controls['comment'].invalid && (form.controls['comment'].dirty || form.controls['comment'].touched)"
-         class="alert alert-danger">
-      <div *ngIf="form.controls['comment'].errors.pattern && form.controls['comment'].touched">
-        Пожалуйста, пользуйтесь только кириллицей.
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <button mat-raised-button type="submit" color="primary" [disabled]="submitIsLocked">Отправить</button>
-    <div *ngIf="form.invalid && submitIsLocked" class="alert alert-danger">
-      Форма содержит ошибки.
-    </div>
-    <div *ngIf="successSubmitted" class="alert alert-success">Форма успешно отправлена!</div>
-  </div>
 
 </form>
 

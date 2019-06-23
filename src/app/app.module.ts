@@ -21,11 +21,15 @@ import { MatButtonModule } from '@angular/material/button';
 // Guards
 import { SubmittedOnlyGuard } from './guards/submitted-only.guard';
 
+// Pipes
+import { SafePipe } from './pipes/safe.pipe';
+
 @NgModule({
   declarations: [
     AppComponent,
     FormPageComponent,
-    ResultPageComponent
+    ResultPageComponent,
+    SafePipe
   ],
   imports: [
     BrowserModule,

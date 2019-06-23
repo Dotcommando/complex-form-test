@@ -1,13 +1,65 @@
+.form-group {
+  max-width: 960px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+.left-col {
+  width: 50%;
+  padding: 0 20px;
+  flex-shrink: 0;
+
+  &>.form-row:nth-child(2) {
+    margin: 64px 0 79px 0;
+
+    .alert {
+      margin-bottom: -20px;
+    }
+  }
+
+  &>.form-row:nth-child(3) ::ng-deep .mat-form-field-infix {
+    width: 376px;
+  }
+}
+.right-col {
+  width: 50%;
+  padding: 0 20px;
+  flex-shrink: 0;
+
+  &>.form-row:nth-child(4) {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    .alert {
+      width: 50%;
+      margin-left: 50%;
+      flex-shrink: 0;
+    }
+  }
+
+  .mat-raised-button {
+    display: block;
+    min-width: 50%;
+  }
+}
+
 .form-row {
   padding: 10px 0;
   margin: 0 0 40px 0;
+
+  & > mat-form-field {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
   p {
     margin-bottom: 10px;
   }
 
   ::ng-deep .mat-form-field-infix {
-    width: 240px;
+    width: 400px;
   }
 
   ::ng-deep .mat-radio-button {

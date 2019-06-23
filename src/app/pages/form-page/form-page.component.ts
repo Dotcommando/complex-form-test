@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {FormGroup, Validators, FormBuilder, ValidatorFn, AbstractControl} from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, ValidatorFn, AbstractControl } from '@angular/forms';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Router } from '@angular/router';
@@ -25,12 +25,6 @@ export class FormPageComponent implements OnInit, OnDestroy {
   dateSubscription: Subscription;
   genderSubscription: Subscription;
 
-  fieldsData = {
-    fullname: {
-      placeholder: 'Введите фамилию и имя'
-    }
-  };
-
   maritalStatuses = [];
 
   submitIsLocked = false;
@@ -43,6 +37,16 @@ export class FormPageComponent implements OnInit, OnDestroy {
 
   successSubmitted = false;
 
+  /**
+   * Возвращает статус семйного положения.
+   * Возможные статусы:
+   *   '' - значение по умолчанию.
+   *   'divorced' - в разводе.
+   *   'not-married' - нет семьи.
+   *   'married' - женат/замужем, когда не знаем пола.
+   *   'he-married' - женат.
+   *   'she-married' - замужем.
+   */
   getMaritalStatuses() {
     let statuses = [
       {value: 'divorced', text: 'В разводе'},
@@ -69,7 +73,7 @@ export class FormPageComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private adapter: DateAdapter<any>,
     private router: Router,
-    private formDataService: FormDataService
+    public formDataService: FormDataService
   ) {
     this.adapter.setLocale('ru');
     this.maritalStatuses = this.getMaritalStatuses();
@@ -108,27 +112,40 @@ export class FormPageComponent implements OnInit, OnDestroy {
 
     this.subscribeToGenderChanging();
 
-    this.form
-      .valueChanges
-      .subscribe((e) => {
-        console.log(e);
-      });
+    // this.form
+    //   .valueChanges
+    //   .subscribe((e) => {
+    //     console.log(this.form.valid)
+    //     console.log(e);
+    //   });
   }
 
   ngOnDestroy() {
     this.dateSubscription.unsubscribe();
     this.genderSubscription.unsubscribe();
+    clearTimeout(this.lockSubmitCountdown);
+    clearTimeout(this.successSubmittedCountdown);
   }
 
+  /**
+   * Подписка на изменение даты рождения.
+   */
   private subscribeToDateChanging() {
     this.dateSubscription = this.form.get('birthday')
       .valueChanges
       .subscribe((value) => {
         this.setRequiredValidatorToMaritalStatus(moment().diff(value, 'years') >= 18);
-        console.log('Лет', moment().diff(value, 'years'));
+        // После выбора даты рождения принудительно сбрасываем семейное положение.
+        this.form.get('maritalStatus').setValue('');
+        // console.log('Лет', moment().diff(value, 'years'));
       });
   }
 
+  /**
+   * Подписка на изменение пола.
+   * Чтобы когда надо поменять семейное положение
+   * 'Женат/Замужем' на 'Женат' или 'Замужем'.
+   */
   private subscribeToGenderChanging() {
     this.genderSubscription = this.form.get('gender')
       .valueChanges
@@ -141,6 +158,11 @@ export class FormPageComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Устанавливаем дополнительный валидатор на поле "Семейное положение"
+   * или убираем таковой, если ещё нет 18 лет.
+   * @param set - установить или убрать валидатор.
+   */
   private setRequiredValidatorToMaritalStatus(set: boolean = true) {
     const maritalStatus = this.form.get('maritalStatus');
     const validators: ValidatorFn[] = [ Validators.required ];
@@ -153,6 +175,11 @@ export class FormPageComponent implements OnInit, OnDestroy {
     maritalStatus.updateValueAndValidity();
   }
 
+  /**
+   * Если у юзера не был выбран пол, но было установлено семейное положение
+   * в значение "Женат/Замужем", то теперь, когда мы знаем пол, меняем
+   * семейное положение на конкретное: или "женат", или "замужем".
+   */
   correctStatus() {
     const gender = this.form.get('gender').value;
     const maritalStatus = this.form.get('maritalStatus');
@@ -168,6 +195,11 @@ export class FormPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Ставим ограничение на возможные даты рождения.
+   * С 01.01.1930 по текущую дату.
+   * @param d - дата
+   */
   birthdayPickerFilter = (d: Date): boolean => {
     const checkingDate = moment(d);
     const minimumDate = moment('01.01.1930', 'MM.DD.YYYY');
@@ -175,6 +207,10 @@ export class FormPageComponent implements OnInit, OnDestroy {
     return !(checkingDate.isBefore(minimumDate) || checkingDate.isAfter(today));
   }
 
+  /**
+   * Чекаем все поля, чтобы отработал валидатор.
+   * @param formGroup - форма
+   */
   private markFormGroupTouched(formGroup: FormGroup | AbstractControl) {
     if (!('controls' in formGroup)) { return; }
     Object.values(formGroup.controls).forEach(control => {
@@ -186,6 +222,10 @@ export class FormPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Обрабатываем нажатия клавиш "+" и "-" на поле "Дети".
+   * @param event - keyboardEvent
+   */
   kidsNumberInput(event): boolean {
     const key = event.key;
     const kids = this.form.get('kids');
@@ -193,12 +233,15 @@ export class FormPageComponent implements OnInit, OnDestroy {
       return false;
     } else if (/[+-]/.test(key)) {
       if (isNaN(kids.value)) { return false; }
-      kids.setValue(key === '+' ? kids.value + 1 : kids.value - 1);
+      kids.setValue(key === '+' ? parseInt(kids.value, 10) + 1 :  parseInt(kids.value, 10) - 1);
       return false;
     }
     return true;
   }
 
+  /**
+   * Лочим кнопку отправки на 10 сек.
+   */
   private lockSubmit() {
     this.submitIsLocked = true;
     this.lockSubmitCountdown = setTimeout(() => {
@@ -209,6 +252,7 @@ export class FormPageComponent implements OnInit, OnDestroy {
   submit() {
     this.markFormGroupTouched(this.form);
     if (this.form.invalid) {
+      // Форма не валидна
       this.lockSubmit();
       if (this.submitCounter === 3) {
         this.submitCounter = 0;
@@ -216,12 +260,18 @@ export class FormPageComponent implements OnInit, OnDestroy {
       }
       this.submitCounter++;
     } else {
+      // Форма валидна
       this.submitCounter = 1;
+      this.formDataService.sendData(this.form.value);
       this.formDataService.setShowResults(true);
       this.successSubmitted = true;
       this.successSubmittedCountdown = setTimeout(() => {
         this.successSubmitted = false;
-        this.router.navigate(['/result']);
+        try {
+          this.router.navigate(['/result']);
+        } catch (err) {
+          console.log('Router failed.');
+        }
       }, 1500);
     }
   }

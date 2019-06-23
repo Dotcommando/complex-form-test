@@ -1,3 +1,10 @@
-<p>
-  result-page works!
-</p>
+<div class="form-data-result">
+  <h1>Заполненная анкета:</h1>
+  <p><span class="field-name">Фамилия и имя: </span><span [innerHTML]="data.fullname | safe: 'html'"></span></p>
+  <p><span class="field-name">Пол: </span><span>{{data.gender === 'm' ? 'мужской' : 'женский'}}</span></p>
+  <p><span class="field-name">Дата рождения: </span><span>{{data.birthday.format('DD.MM.YYYY')}}</span></p>
+  <p><span class="field-name">Семейное положение: </span><span>{{processMaritalStatus(data.maritalStatus)}}</span></p>
+  <p><span class="field-name">Дети: </span><span [innerHTML]="data.kids | safe: 'html'"></span></p>
+  <p><span class="field-name">E-mail: </span><span [innerHTML]="data.email | safe: 'html'"></span></p>
+  <p><span class="field-name">Комментарий: </span><span [innerHTML]="data.comment | safe: 'html'"></span></p>
+</div>
